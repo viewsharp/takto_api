@@ -10,7 +10,7 @@ Accept: application/json
 # query: GET /api/v1/business/<business_id>
 # description: get business by business_id
 # example:
-GET http://127.0.0.1:8000/api/v1/business/kUPlKgW6OLRw8_rrYtBV3A
+GET http://127.0.0.1:8000/api/v1/business/f9NumwFMBDn751xgFiRbNA
 Authorization: someone
 Accept: application/json
 

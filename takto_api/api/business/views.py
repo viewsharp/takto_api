@@ -49,7 +49,7 @@ class RoomCreateAPIView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         room = serializer.save()
-        UserInRoom.create_with_choice(room=room, user=self.request.user)
+        UserInRoom.create_object_with_choice(room=room, user=self.request.user)
         serializer.save()
 
 
@@ -62,7 +62,7 @@ class RoomRetrieveAPIView(generics.RetrieveAPIView):
 class JoinToRoomAPIView(RoomRetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         room = self.get_object()
-        UserInRoom.create_with_choice(room=room, user=request.user)
+        UserInRoom.create_object_with_choice(room=room, user=request.user)
 
         room.refresh_from_db()
         serializer = self.get_serializer(room)
@@ -78,7 +78,7 @@ class ChoiceRetrieveAPIView(generics.RetrieveAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        new_choice = Choice.create_random(
+        new_choice = Choice.create_random_object(
             user_in_room=prev_choice.user_in_room,
             first_business=prev_choice.first_business if prev_choice.first_business_chosen else prev_choice.second_business
         )

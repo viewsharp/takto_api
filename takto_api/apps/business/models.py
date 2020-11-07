@@ -25,6 +25,10 @@ class Business(models.Model):
     hours = models.JSONField(null=True)
     categories = models.ManyToManyField(Category)
 
+    @classmethod
+    def get_random_object(cls):
+        return Business.objects.filter(photos__isnull=False).order_by('?').first()
+
 
 class Photo(models.Model):
     photo_id = models.CharField(max_length=32)
@@ -64,9 +68,9 @@ class UserInRoom(models.Model):
         ]
 
     @classmethod
-    def create_with_choice(cls, room, user):
+    def create_object_with_choice(cls, room, user):
         instance = cls.objects.create(room=room, user=user)
-        Choice.create_random(instance)
+        Choice.create_random_object(instance)
         return instance
 
 
@@ -77,9 +81,9 @@ class Choice(models.Model):
     first_business_chosen = models.BooleanField(null=True)
 
     @classmethod
-    def create_random(cls, user_in_room, first_business=None):
+    def create_random_object(cls, user_in_room, first_business=None):
         return cls.objects.create(
             user_in_room=user_in_room,
-            first_business=first_business or Business.objects.order_by('?').first(),
-            second_business=Business.objects.order_by('?').first()
+            first_business=first_business or Business.get_random_object(),
+            second_business=Business.get_random_object()
         )

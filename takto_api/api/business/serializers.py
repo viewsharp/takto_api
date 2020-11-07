@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from takto_api.apps.business.models import Business, User, UserInRoom, Room, Photo, Choice
+from takto_api.apps.business.models import Business, User, UserInRoom, Room, Photo, Choice, Category
 
 
 class PhotoSerializer(serializers.ModelSerializer):
@@ -9,8 +9,13 @@ class PhotoSerializer(serializers.ModelSerializer):
         fields = ('photo_id', 'caption', 'label')
 
 
+class CategorySerializer(serializers.Serializer):
+    def to_representation(self, instance: Category):
+        return instance.name
+
+
 class BusinessSerializer(serializers.ModelSerializer):
-    categories = serializers.ListField(source='categories.name', child=serializers.CharField())
+    categories = CategorySerializer(read_only=True, many=True)
     photos = PhotoSerializer(read_only=True, many=True)
 
     class Meta:
