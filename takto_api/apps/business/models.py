@@ -50,17 +50,10 @@ class Room(models.Model):
 
 
 class UserInRoom(models.Model):
-    class Status:
-        VOTING = 'voting'
-        READY = 'ready'
-        choices = [
-            (VOTING, 'Голосует'),
-            (READY, 'Готов'),
-        ]
+    CHOICE_COUNT = 6
 
     room = models.ForeignKey(Room, related_name='user_in_room', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='user_in_room', on_delete=models.SET_NULL, null=True)
-    status = models.CharField(max_length=16, choices=Status.choices, default=Status.VOTING)
 
     class Meta:
         constraints = [
@@ -72,6 +65,10 @@ class UserInRoom(models.Model):
         instance = cls.objects.create(room=room, user=user)
         Choice.create_random_object(instance)
         return instance
+
+    @property
+    def ready(self):
+        return self.choices.count() >= self.CHOICE_COUNT
 
 
 class Choice(models.Model):

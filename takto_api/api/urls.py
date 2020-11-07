@@ -1,7 +1,7 @@
 from django.urls import path
 
 from takto_api.api.business.views import BusinessListAPIView, BusinessRetrieveAPIView, UserCreateRetrieveAPIView, \
-    RoomCreateAPIView, RoomRetrieveAPIView, JoinToRoomAPIView, ChoiceRetrieveAPIView
+    RoomCreateAPIView, RoomRetrieveAPIView, JoinToRoomAPIView, ChoiceAPIView
 
 app_name = 'api'
 
@@ -15,5 +15,5 @@ urlpatterns = [
     path('v1/room/<str:room_id>', RoomRetrieveAPIView.as_view()),
     path('v1/room/<str:room_id>/join', JoinToRoomAPIView.as_view()),
 
-    path('v1/room/<str:room_id>/choice', ChoiceRetrieveAPIView.as_view()),
+    path('v1/room/<str:room_id>/choice', ChoiceAPIView.as_view()),
 ]

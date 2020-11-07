@@ -37,7 +37,7 @@ class UserCreateRetrieveAPIView(generics.RetrieveAPIView, generics.CreateAPIView
             user = None
 
         data = {**request.data, 'device_id': request.META['HTTP_AUTHORIZATION']}
-        serializer = self.get_serializer(instance=user, data=data)
+        serializer = self.get_serializer(user, data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -69,25 +69,41 @@ class JoinToRoomAPIView(RoomRetrieveAPIView):
         return response.Response(serializer.data)
 
 
-class ChoiceRetrieveAPIView(generics.RetrieveAPIView):
+class ChoiceAPIView(generics.GenericAPIView):
     serializer_class = ChoiceSerializer
 
     def put(self, request, *args, **kwargs):
-        prev_choice = self.get_object()
-        serializer = self.get_serializer(instance=prev_choice, data=request.data)
+        user_in_room = self.get_user_in_room()
+        
+        prev_choice = self.get_object(user_in_room=user_in_room)
+        serializer = self.get_serializer(prev_choice, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        
+        if user_in_room.ready:
+            return response.Response()
 
         new_choice = Choice.create_random_object(
             user_in_room=prev_choice.user_in_room,
             first_business=prev_choice.first_business if prev_choice.first_business_chosen else prev_choice.second_business
         )
-        serializer = self.get_serializer(instance=new_choice)
+        serializer = self.get_serializer(new_choice)
+        return response.Response(serializer.data)
+    
+    def get(self, request, *args, **kwargs):
+        user_in_room = self.get_user_in_room()
+
+        if user_in_room.ready:
+            return response.Response()
+        
+        instance = self.get_object(user_in_room)
+        serializer = self.get_serializer(instance)
         return response.Response(serializer.data)
 
-    def get_object(self):
-        return Choice.objects.get(
-            user_in_room__room__room_id=self.kwargs['room_id'],
-            user_in_room__user=self.request.user,
-            first_business_chosen__isnull=True
-        )
+    def get_object(self, user_in_room=None):
+        user_in_room = user_in_room or self.get_user_in_room()
+        
+        return Choice.objects.get(user_in_room=user_in_room, first_business_chosen__isnull=True)
+    
+    def get_user_in_room(self):
+        return UserInRoom.objects.get(room__room_id=self.kwargs['room_id'], user=self.request.user)

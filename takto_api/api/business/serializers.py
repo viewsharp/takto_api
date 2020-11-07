@@ -34,10 +34,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserInRoomSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
+    ready = serializers.BooleanField()
 
     class Meta:
         model = UserInRoom
-        fields = ('status', 'username')
+        fields = ('username', 'ready')
 
 
 class RoomSerializer(serializers.ModelSerializer):
