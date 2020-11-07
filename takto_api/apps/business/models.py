@@ -62,3 +62,24 @@ class UserInRoom(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['room', 'user'], name='unique_room_user')
         ]
+
+    @classmethod
+    def create_with_choice(cls, room, user):
+        instance = cls.objects.create(room=room, user=user)
+        Choice.create_random(instance)
+        return instance
+
+
+class Choice(models.Model):
+    user_in_room = models.ForeignKey(UserInRoom, related_name='choices', on_delete=models.CASCADE)
+    first_business = models.ForeignKey(Business, related_name='+', on_delete=models.SET_NULL, null=True)
+    second_business = models.ForeignKey(Business, related_name='+', on_delete=models.SET_NULL, null=True)
+    first_business_chosen = models.BooleanField(null=True)
+
+    @classmethod
+    def create_random(cls, user_in_room, first_business=None):
+        return cls.objects.create(
+            user_in_room=user_in_room,
+            first_business=first_business or Business.objects.order_by('?').first(),
+            second_business=Business.objects.order_by('?').first()
+        )

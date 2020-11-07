@@ -1,8 +1,7 @@
-from django.http import Http404
 from rest_framework import pagination, generics, status, response, decorators
 
-from takto_api.api.business.serializers import BusinessSerializer, UserSerializer, RoomSerializer
-from takto_api.apps.business.models import Business, User, UserInRoom, Room
+from takto_api.api.business.serializers import BusinessSerializer, UserSerializer, RoomSerializer, ChoiceSerializer
+from takto_api.apps.business.models import Business, User, UserInRoom, Room, Choice
 
 
 class DefaultPageNumberPagination(pagination.PageNumberPagination):
@@ -12,13 +11,13 @@ class DefaultPageNumberPagination(pagination.PageNumberPagination):
 class BusinessListAPIView(generics.ListAPIView):
     serializer_class = BusinessSerializer
     pagination_class = DefaultPageNumberPagination
-    queryset = Business
+    queryset = Business.objects.all()
 
 
 class BusinessRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = BusinessSerializer
     lookup_field = 'business_id'
-    queryset = Business
+    queryset = Business.objects.all()
 
 
 @decorators.authentication_classes([])
@@ -50,21 +49,45 @@ class RoomCreateAPIView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         room = serializer.save()
-        UserInRoom.objects.create(room=room, user=self.request.user)
+        UserInRoom.create_with_choice(room=room, user=self.request.user)
         serializer.save()
 
 
 class RoomRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = RoomSerializer
     lookup_field = 'room_id'
-    queryset = Room
+    queryset = Room.objects.all()
 
 
 class JoinToRoomAPIView(RoomRetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         room = self.get_object()
-        UserInRoom.objects.create(room=room, user=request.user)
+        UserInRoom.create_with_choice(room=room, user=request.user)
 
         room.refresh_from_db()
         serializer = self.get_serializer(room)
         return response.Response(serializer.data)
+
+
+class ChoiceRetrieveAPIView(generics.RetrieveAPIView):
+    serializer_class = ChoiceSerializer
+
+    def put(self, request, *args, **kwargs):
+        prev_choice = self.get_object()
+        serializer = self.get_serializer(instance=prev_choice, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        new_choice = Choice.create_random(
+            user_in_room=prev_choice.user_in_room,
+            first_business=prev_choice.first_business if prev_choice.first_business_chosen else prev_choice.second_business
+        )
+        serializer = self.get_serializer(instance=new_choice)
+        return response.Response(serializer.data)
+
+    def get_object(self):
+        return Choice.objects.get(
+            user_in_room__room__room_id=self.kwargs['room_id'],
+            user_in_room__user=self.request.user,
+            first_business_chosen__isnull=True
+        )

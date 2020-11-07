@@ -1,7 +1,7 @@
 # query: GET /api/v1/business
 # description: get business oredered by geo-distance
 # example:
-GET http://84.201.163.58:33319/api/v1/business
+GET http://127.0.0.1:8000/api/v1/business
 Authorization: someone
 Accept: application/json
 
@@ -10,7 +10,7 @@ Accept: application/json
 # query: GET /api/v1/business/<business_id>
 # description: get business by business_id
 # example:
-GET http://84.201.163.58:33319/api/v1/business/kUPlKgW6OLRw8_rrYtBV3A
+GET http://127.0.0.1:8000/api/v1/business/kUPlKgW6OLRw8_rrYtBV3A
 Authorization: someone
 Accept: application/json
 
@@ -19,14 +19,14 @@ Accept: application/json
 # query: GET /photos/<photo_id>
 # description: get photo by photo_id
 # example:
-GET http://84.201.163.58:33319/photos/FlNVq0vjNw16VHzVp62DAA.jpg
+GET http://127.0.0.1:8000/photos/FlNVq0vjNw16VHzVp62DAA.jpg
 
 ###
 
 # query: GET /api/v1/user
 # description: get current user or 404
 # example:
-GET http://84.201.163.58:33319/api/v1/user
+GET http://127.0.0.1:8000/api/v1/user
 Authorization: someone
 Accept: application/json
 
@@ -35,7 +35,7 @@ Accept: application/json
 # query: POST /api/v1/user
 # description: create user
 # example:
-POST http://84.201.163.58:33319/api/v1/user
+POST http://127.0.0.1:8000/api/v1/user
 Authorization: someone
 Accept: application/json
 Content-Type: application/json
@@ -47,24 +47,45 @@ Content-Type: application/json
 # query: POST /api/v1/room
 # description: create room
 # example:
-POST http://84.201.163.58:33319/api/v1/room
+POST http://127.0.0.1:8000/api/v1/room
 Authorization: someone
 Accept: application/json
 
 ###
 
-# query: POST /api/v1/room/<room_id>
+# query: GET /api/v1/room/<room_id>
 # description: get room by room_id
 # example:
-GET http://84.201.163.58:33319/api/v1/room/c41adbf6-a59e-4ff0-87d0-beb8e2dc2389
+GET http://127.0.0.1:8000/api/v1/room/b7bd1bcb-18c7-4f28-b3bf-5b1ee2163500
+Authorization: someone
+Accept: application/json
+
+###
+
+# query: GET /api/v1/room/<room_id>/join
+# description: join to room by room_id
+# example:
+GET http://127.0.0.1:8000/api/v1/room/c41adbf6-a59e-4ff0-87d0-beb8e2dc2389/join
 Authorization: Test
 Accept: application/json
 
 ###
 
-# query: POST /api/v1/room/<room_id>/join
-# description: join to room by room_id
+# query: GET /api/v1/room/<room_id>/choice
+# description: get choices
 # example:
-GET http://84.201.163.58:33319/api/v1/room/c41adbf6-a59e-4ff0-87d0-beb8e2dc2389/join
-Authorization: Test
+GET http://127.0.0.1:8000/api/v1/room/b7bd1bcb-18c7-4f28-b3bf-5b1ee2163500/choice
+Authorization: someone
 Accept: application/json
+
+###
+
+# query: PUT /api/v1/room/<room_id>/choice
+# description: make a choice
+# example:
+PUT http://127.0.0.1:8000/api/v1/room/b7bd1bcb-18c7-4f28-b3bf-5b1ee2163500/choice
+Authorization: someone
+Accept: application/json
+Content-Type: application/json
+
+{"first_business_chosen":  false}

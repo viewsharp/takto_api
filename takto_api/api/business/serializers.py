@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from takto_api.apps.business.models import Business, User, UserInRoom, Room, Photo
+from takto_api.apps.business.models import Business, User, UserInRoom, Room, Photo, Choice
 
 
 class PhotoSerializer(serializers.ModelSerializer):
@@ -47,3 +47,12 @@ class UserWithRoomsSerializer(UserSerializer):
     rooms = RoomSerializer(source='user_in_room.room')
 
     Meta = UserSerializer.Meta
+
+
+class ChoiceSerializer(serializers.ModelSerializer):
+    first_business = BusinessSerializer(read_only=True)
+    second_business = BusinessSerializer(read_only=True)
+
+    class Meta:
+        model = Choice
+        fields = ('first_business', 'second_business', 'first_business_chosen')
