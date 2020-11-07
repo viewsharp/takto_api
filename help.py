@@ -31,7 +31,12 @@ def create_business():
     from takto_api.apps.business.models import Business
     from django.db import connection
 
-    def flush(business_buff):
+    business_buff = []
+    categories_buff = []
+
+    def flush():
+        nonlocal business_buff, categories_buff
+
         business_buff = Business.objects.bulk_create(business_buff)
 
         with connection.cursor() as cursor:
@@ -45,6 +50,11 @@ def create_business():
                 ' ON CONFLICT DO NOTHING'
             )
 
+        result = len(business_buff)
+        business_buff = []
+        categories_buff = []
+        return result
+
     category_by_name = {
         category.name: category
         for category in create_categories()
@@ -53,14 +63,9 @@ def create_business():
     exists_business_ids = set(Business.objects.values_list('business_id', flat=True))
 
     with open(f'{dir_path}/dev/yelp_dataset/yelp_academic_dataset_business.json') as yelp_business:
-        business_buff = []
-        categories_buff = []
 
         for row in yelp_business:
             business = json.loads(row)
-
-            if business["business_id"] == 'gHngt6zpP683GKe1i23LUg':
-                _ = 1
 
             if business["business_id"] in exists_business_ids or len(business['state']) > 2:
                 continue
@@ -87,33 +92,29 @@ def create_business():
                 categories_buff.append([])
 
             if len(business_buff) > 1023:
-                business_buff = Business.objects.bulk_create(business_buff)
+                print('flush:', flush())
 
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        'INSERT INTO "business_business_categories" ("business_id", "category_id") VALUES ' +
-                        ', '.join(
-                            f'({business.id}, {category.id})'
-                            for business, categories in zip(business_buff, categories_buff)
-                            for category in categories
-                        ) +
-                        ' ON CONFLICT DO NOTHING'
-                    )
-
-                print('flush:', len(business_buff))
-                business_buff = []
-                categories_buff = []
+    print('flush:', flush())
 
 
 def create_business_photos():
     from takto_api.apps.business.models import Business, Photo
 
+    photo_buff = []
+
+    def flush():
+        nonlocal photo_buff
+
+        Photo.objects.bulk_create(photo_buff)
+
+        result = len(photo_buff)
+        photo_buff = []
+        return result
+
     business_by_id = {business.business_id: business for business in Business.objects.all()}
     print('load all business')
 
     with open(f'{dir_path}/dev/yelp_dataset/photos.json') as yelp_business:
-        photo_buff = []
-
         for row in yelp_business:
             photo = json.loads(row)
             photo_buff.append(Photo(
@@ -124,12 +125,11 @@ def create_business_photos():
             ))
 
             if len(photo_buff) > 1023:
-                Business.objects.bulk_create(photo_buff)
+                print('flush:', flush())
 
-                print('flush:', len(photo_buff))
-                photo_buff = []
+    print('flush:', flush())
 
 
 if __name__ == '__main__':
-    create_business()
+    # create_business()
     create_business_photos()

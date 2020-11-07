@@ -1,15 +1,22 @@
 from rest_framework import serializers
 
-from takto_api.apps.business.models import Business, User, UserInRoom, Room
+from takto_api.apps.business.models import Business, User, UserInRoom, Room, Photo
+
+
+class PhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Photo
+        fields = ('photo_id', 'caption', 'label')
 
 
 class BusinessSerializer(serializers.ModelSerializer):
     categories = serializers.ListField(source='categories.name', child=serializers.CharField())
+    photos = PhotoSerializer(read_only=True, many=True)
 
     class Meta:
         model = Business
         fields = ('business_id', 'name', 'state', 'city', 'address', 'postal_code', 'latitude', 'longitude', 'stars',
-                  'review_count', 'is_open', 'attributes', 'hours', 'categories')
+                  'review_count', 'is_open', 'attributes', 'hours', 'categories', 'photos')
 
 
 class UserSerializer(serializers.ModelSerializer):
