@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'takto_api',
-    'takto_api.apps.business'
+    'takto_api.apps.business',
+
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
