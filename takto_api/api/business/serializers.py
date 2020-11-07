@@ -13,10 +13,11 @@ class BusinessSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    device_id = serializers.CharField(write_only=True)
+
     class Meta:
         model = User
-        write_only_fields = ('device_id',)
-        fields = ('username',)
+        fields = ('username', 'device_id')
 
 
 class UserInRoomSerializer(serializers.ModelSerializer):

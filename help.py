@@ -27,9 +27,23 @@ def create_categories():
     return Category.objects.bulk_create([Category(name=name) for name in categories])
 
 
-def main():
+def create_business():
     from takto_api.apps.business.models import Business
     from django.db import connection
+
+    def flush(business_buff):
+        business_buff = Business.objects.bulk_create(business_buff)
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'INSERT INTO "business_business_categories" ("business_id", "category_id") VALUES ' +
+                ', '.join(
+                    f'({business.id}, {category.id})'
+                    for business, categories in zip(business_buff, categories_buff)
+                    for category in categories
+                ) +
+                ' ON CONFLICT DO NOTHING'
+            )
 
     category_by_name = {
         category.name: category
@@ -44,6 +58,9 @@ def main():
 
         for row in yelp_business:
             business = json.loads(row)
+
+            if business["business_id"] == 'gHngt6zpP683GKe1i23LUg':
+                _ = 1
 
             if business["business_id"] in exists_business_ids or len(business['state']) > 2:
                 continue
@@ -88,5 +105,31 @@ def main():
                 categories_buff = []
 
 
+def create_business_photos():
+    from takto_api.apps.business.models import Business, Photo
+
+    business_by_id = {business.business_id: business for business in Business.objects.all()}
+    print('load all business')
+
+    with open(f'{dir_path}/dev/yelp_dataset/photos.json') as yelp_business:
+        photo_buff = []
+
+        for row in yelp_business:
+            photo = json.loads(row)
+            photo_buff.append(Photo(
+                photo_id=photo['photo_id'],
+                caption=photo['caption'],
+                label=photo['label'],
+                business=business_by_id[photo['business_id']]
+            ))
+
+            if len(photo_buff) > 1023:
+                Business.objects.bulk_create(photo_buff)
+
+                print('flush:', len(photo_buff))
+                photo_buff = []
+
+
 if __name__ == '__main__':
-    main()
+    create_business()
+    create_business_photos()

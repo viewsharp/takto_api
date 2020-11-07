@@ -31,14 +31,14 @@ Accept: application/json
 ###
 
 # query: POST /api/v1/user
-# description: get current user or 404
+# description: create user
 # example:
 POST http://127.0.0.1:8000/api/v1/user
-Authorization: Test
+Authorization: someone
 Accept: application/json
 Content-Type: application/json
 
-{"username": "test"}
+{"username": "test1"}
 
 ###
 
@@ -46,13 +46,13 @@ Content-Type: application/json
 # description: create room
 # example:
 POST http://127.0.0.1:8000/api/v1/room
-Authorization: Test
+Authorization: someone
 Accept: application/json
 
 ###
 
 # query: POST /api/v1/room/<room_id>
-# description: create room
+# description: get room by room_id
 # example:
 GET http://127.0.0.1:8000/api/v1/room/c41adbf6-a59e-4ff0-87d0-beb8e2dc2389
 Authorization: Test
@@ -61,7 +61,7 @@ Accept: application/json
 ###
 
 # query: POST /api/v1/room/<room_id>/join
-# description: create room
+# description: join to room by room_id
 # example:
 GET http://127.0.0.1:8000/api/v1/room/c41adbf6-a59e-4ff0-87d0-beb8e2dc2389/join
 Authorization: Test

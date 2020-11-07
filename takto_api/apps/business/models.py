@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 
 
@@ -33,7 +34,10 @@ class Photo(models.Model):
 
 
 class User(AbstractUser):
+    username = models.CharField(max_length=150, validators=[UnicodeUsernameValidator()])
     device_id = models.CharField(max_length=64, unique=True)
+
+    USERNAME_FIELD = 'device_id'
 
 
 class Room(models.Model):
@@ -53,3 +57,8 @@ class UserInRoom(models.Model):
     room = models.ForeignKey(Room, related_name='user_in_room', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='user_in_room', on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.VOTING)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['room', 'user'], name='unique_room_user')
+        ]
