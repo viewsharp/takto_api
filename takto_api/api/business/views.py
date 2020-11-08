@@ -16,17 +16,13 @@ class UserCreateRetrieveAPIView(generics.RetrieveAPIView, generics.CreateAPIView
     serializer_class = UserSerializer
 
     def get_object(self):
-        return self.request.user
-
-    def create(self, request, *args, **kwargs):
-        pass
+        try:
+            return User.objects.get(device_id=self.request.META['HTTP_AUTHORIZATION'])
+        except User.DoesNotExist:
+            return None
 
     def post(self, request, *args, **kwargs):
-        try:
-            user = User.objects.get(device_id=request.META['HTTP_AUTHORIZATION'])
-        except User.DoesNotExist:
-            user = None
-
+        user = self.get_object()
         data = {**request.data, 'device_id': request.META['HTTP_AUTHORIZATION']}
         serializer = self.get_serializer(user, data=data)
         serializer.is_valid(raise_exception=True)
