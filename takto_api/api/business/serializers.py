@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from takto_api.apps.business.models import Business, User, UserInRoom, Room, Photo, Choice, Category
+from takto_api.apps.business.models import (Business, Category, Choice, Photo,
+                                            Room, User, UserInRoom)
 
 
 class PhotoSerializer(serializers.ModelSerializer):

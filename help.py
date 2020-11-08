@@ -28,8 +28,9 @@ def create_categories():
 
 
 def create_business():
-    from takto_api.apps.business.models import Business
     from django.db import connection
+
+    from takto_api.apps.business.models import Business
 
     business_buff = []
     categories_buff = []

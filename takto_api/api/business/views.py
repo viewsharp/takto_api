@@ -1,23 +1,14 @@
-from rest_framework import pagination, generics, status, response, decorators
+from rest_framework import decorators, generics, pagination, response, status
 
-from takto_api.api.business.serializers import BusinessSerializer, UserSerializer, RoomSerializer, ChoiceSerializer
-from takto_api.apps.business.models import Business, User, UserInRoom, Room, Choice
+from takto_api.api.business.serializers import (BusinessSerializer,
+                                                ChoiceSerializer,
+                                                RoomSerializer, UserSerializer)
+from takto_api.apps.business.models import (Business, Choice, Room, User,
+                                            UserInRoom)
 
 
 class DefaultPageNumberPagination(pagination.PageNumberPagination):
     page_size = 20
-
-
-class BusinessListAPIView(generics.ListAPIView):
-    serializer_class = BusinessSerializer
-    pagination_class = DefaultPageNumberPagination
-    queryset = Business.objects.all()
-
-
-class BusinessRetrieveAPIView(generics.RetrieveAPIView):
-    serializer_class = BusinessSerializer
-    lookup_field = 'business_id'
-    queryset = Business.objects.all()
 
 
 @decorators.authentication_classes([])
@@ -107,3 +98,9 @@ class ChoiceAPIView(generics.GenericAPIView):
     
     def get_user_in_room(self):
         return UserInRoom.objects.get(room__room_id=self.kwargs['room_id'], user=self.request.user)
+
+
+class BusinessListAPIView(generics.ListAPIView):
+    serializer_class = BusinessSerializer
+    pagination_class = DefaultPageNumberPagination
+    queryset = Business.objects.filter(photos__isnull=False)
