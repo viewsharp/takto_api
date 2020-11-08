@@ -89,3 +89,12 @@ Accept: application/json
 Content-Type: application/json
 
 {"first_business_chosen":  false}
+
+###
+
+# query: GET /api/v1/room/<room_id>/business
+# description: get recomended business
+# example:
+GET http://127.0.0.1:8000/api/v1/room/b7bd1bcb-18c7-4f28-b3bf-5b1ee2163500/business
+Authorization: someone
+Accept: application/json
