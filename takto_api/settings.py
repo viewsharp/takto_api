@@ -130,3 +130,6 @@ REST_FRAMEWORK = {
         'takto_api.auth.Authentication'
     ]
 }
+
+AITO_INSTANCE_URL = os.environ['AITO_INSTANCE_URL']
+AITO_API_KEY = os.environ['AITO_API_KEY']

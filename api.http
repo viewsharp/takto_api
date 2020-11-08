@@ -56,7 +56,7 @@ Accept: application/json
 # query: GET /api/v1/room/<room_id>
 # description: get room by room_id
 # example:
-GET http://127.0.0.1:8000/api/v1/room/b7bd1bcb-18c7-4f28-b3bf-5b1ee2163500
+GET http://127.0.0.1:8000/api/v1/room/64c7af58-b842-4024-a27b-4ffcd3d830db
 Authorization: someone
 Accept: application/json
 
@@ -65,7 +65,7 @@ Accept: application/json
 # query: GET /api/v1/room/<room_id>/join
 # description: join to room by room_id
 # example:
-GET http://127.0.0.1:8000/api/v1/room/c41adbf6-a59e-4ff0-87d0-beb8e2dc2389/join
+GET http://127.0.0.1:8000/api/v1/room/64c7af58-b842-4024-a27b-4ffcd3d830db/join
 Authorization: Test
 Accept: application/json
 
@@ -74,7 +74,7 @@ Accept: application/json
 # query: GET /api/v1/room/<room_id>/choice
 # description: get choices
 # example:
-GET http://127.0.0.1:8000/api/v1/room/b7bd1bcb-18c7-4f28-b3bf-5b1ee2163500/choice
+GET http://127.0.0.1:8000/api/v1/room/64c7af58-b842-4024-a27b-4ffcd3d830db/choice
 Authorization: someone
 Accept: application/json
 
@@ -83,7 +83,7 @@ Accept: application/json
 # query: PUT /api/v1/room/<room_id>/choice
 # description: make a choice
 # example:
-PUT http://127.0.0.1:8000/api/v1/room/b7bd1bcb-18c7-4f28-b3bf-5b1ee2163500/choice
+PUT http://127.0.0.1:8000/api/v1/room/64c7af58-b842-4024-a27b-4ffcd3d830db/choice
 Authorization: someone
 Accept: application/json
 Content-Type: application/json
@@ -95,6 +95,6 @@ Content-Type: application/json
 # query: GET /api/v1/room/<room_id>/business
 # description: get recomended business
 # example:
-GET http://127.0.0.1:8000/api/v1/room/b7bd1bcb-18c7-4f28-b3bf-5b1ee2163500/business
+GET http://127.0.0.1:8000/api/v2/room/64c7af58-b842-4024-a27b-4ffcd3d830db/business
 Authorization: someone
 Accept: application/json

@@ -1,0 +1,18 @@
+{
+    "columns": {
+        "room_id": {
+            "nullable": false,
+            "type": "String"
+        },
+        "business_id": {
+            "nullable": false,
+            "link": "business.business_id",
+            "type": "String"
+        },
+        "chosen": {
+            "nullable": false,
+            "type": "Boolean"
+        }
+    },
+    "type": "table"
+}

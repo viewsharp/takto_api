@@ -1,0 +1,48 @@
+{
+    "columns": {
+        "attributes": {
+            "analyzer": {
+                "delimiter": "|",
+                "trimWhitespace": true,
+                "type": "delimiter"
+            },
+            "nullable": true,
+            "type": "Text"
+        },
+        "business_id": {
+            "nullable": false,
+            "type": "String"
+        },
+        "categories": {
+            "analyzer": {
+                "delimiter": "|",
+                "trimWhitespace": true,
+                "type": "delimiter"
+            },
+            "nullable": true,
+            "type": "Text"
+        },
+        "latitude": {
+            "nullable": false,
+            "type": "Decimal"
+        },
+        "longitude": {
+            "nullable": false,
+            "type": "Decimal"
+        },
+        "name": {
+            "analyzer": {
+                "delimiter": "|",
+                "trimWhitespace": true,
+                "type": "delimiter"
+            },
+            "nullable": true,
+            "type": "Text"
+        },
+        "starts": {
+            "nullable": false,
+            "type": "Decimal"
+        }
+    },
+    "type": "table"
+}

@@ -1,6 +1,6 @@
 import json
 import os
-
+import re
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'takto_api.settings')
@@ -10,8 +10,6 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 def create_categories():
     from takto_api.apps.business.models import Category
-
-    return Category.objects.all()
 
     categories = set()
 
@@ -131,6 +129,57 @@ def create_business_photos():
     print('flush:', flush())
 
 
+convert_values = {
+    'yes': 'true',
+    'yes_corkage': 'true',
+    'no': 'false',
+    'yes_free': 'free'
+}
+
+
+def write_csv():
+    def prepare_string(value: str):
+        value = value.lower()
+
+        if value[0] == "'" and value[-1] == "'":
+            value = value[1:-1]
+
+        elif value[:2] == "u'" and value[-1] == "'":
+            value = value[2:-1]
+
+        return convert_values.get(value, value)
+
+    with open(f'{dir_path}/dev/yelp_dataset/yelp_academic_dataset_business.json') as src, open(f'{dir_path}/business.csv', 'w') as dest:
+        dest.write('business_id,name,starts,categories,attributes,latitude,longitude\n')
+
+        for row in src:
+            business = json.loads(row)
+
+            business_id = business['business_id']
+            name = re.sub(r'[^\w]+', '|', business['name']).lower()
+            starts = business['stars']
+
+            if business['categories']:
+                categories = business['categories'].replace(", ", "|").lower()
+            else:
+                categories = ''
+
+            if business['attributes']:
+                attributes = '|'.join(
+                    prepare_string(key) + '_' + prepare_string(value)
+                    for key, value in business['attributes'].items()
+                    if '{' not in value and prepare_string(value) != 'none'
+                )
+            else:
+                attributes = ''
+
+            latitude = business['latitude']
+            longitude = business['longitude']
+
+            dest.write(f'{business_id},"{name}",{starts},"{categories}","{attributes}",{latitude},{longitude}\n')
+
+
 if __name__ == '__main__':
     # create_business()
-    create_business_photos()
+    # create_business_photos()
+    write_csv()

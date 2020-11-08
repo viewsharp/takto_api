@@ -5,6 +5,8 @@ from takto_api.api.business.serializers import (BusinessSerializer,
                                                 RoomSerializer, UserSerializer)
 from takto_api.apps.business.models import (Business, Choice, Room, User,
                                             UserInRoom)
+from takto_api.clients import aito
+from takto_api.clients.aito import get_recommendation
 
 
 class DefaultPageNumberPagination(pagination.PageNumberPagination):
@@ -65,12 +67,22 @@ class ChoiceAPIView(generics.GenericAPIView):
 
     def put(self, request, *args, **kwargs):
         user_in_room = self.get_user_in_room()
-        
+
         prev_choice = self.get_object(user_in_room=user_in_room)
         serializer = self.get_serializer(prev_choice, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        
+
+        aito.add_choices([{
+            'room_id': self.kwargs['room_id'],
+            'business_id': prev_choice.first_business.business_id,
+            'chosen': prev_choice.first_business_chosen
+        }, {
+            'room_id': self.kwargs['room_id'],
+            'business_id': prev_choice.second_business.business_id,
+            'chosen': not prev_choice.first_business_chosen
+        }])
+
         if user_in_room.ready:
             return response.Response()
 
@@ -80,22 +92,22 @@ class ChoiceAPIView(generics.GenericAPIView):
         )
         serializer = self.get_serializer(new_choice)
         return response.Response(serializer.data)
-    
+
     def get(self, request, *args, **kwargs):
         user_in_room = self.get_user_in_room()
 
         if user_in_room.ready:
             return response.Response()
-        
+
         instance = self.get_object(user_in_room)
         serializer = self.get_serializer(instance)
         return response.Response(serializer.data)
 
     def get_object(self, user_in_room=None):
         user_in_room = user_in_room or self.get_user_in_room()
-        
+
         return Choice.objects.get(user_in_room=user_in_room, first_business_chosen__isnull=True)
-    
+
     def get_user_in_room(self):
         return UserInRoom.objects.get(room__room_id=self.kwargs['room_id'], user=self.request.user)
 
@@ -104,3 +116,14 @@ class BusinessListAPIView(generics.ListAPIView):
     serializer_class = BusinessSerializer
     pagination_class = DefaultPageNumberPagination
     queryset = Business.objects.filter(photos__isnull=False)
+
+
+class BusinessRecommendsListAPIView(generics.ListAPIView):
+    serializer_class = BusinessSerializer
+    pagination_class = DefaultPageNumberPagination
+    queryset = Business.objects.filter(photos__isnull=False)
+
+    def get_queryset(self):
+        recommendation = get_recommendation(self.kwargs['room_id'])
+        print(recommendation)
+        return Business.objects.filter(business_id__in=[hit['business_id'] for hit in recommendation['hits']])
